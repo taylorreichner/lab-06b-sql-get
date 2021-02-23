@@ -3,6 +3,7 @@ require('dotenv').config();
 const { execSync } = require('child_process');
 
 const fakeRequest = require('supertest');
+const quarterbacks = require('../data/quarterbacks');
 const app = require('../lib/app');
 const client = require('../lib/client');
 
@@ -104,6 +105,87 @@ describe('app routes', () => {
         .expect(200);
 
       expect(data.body).toEqual(singleQB);
+  });
+
+    test('creates new quarterback thats is on the QB list', async() => {
+      const newQuarterback = {
+        name: 'Matt_Stafford',
+        accuracy: 89,
+        is_old: true,
+      };
+      const expectedQuarterback = {
+        ...newQuarterback,
+        id: 7,
+        owner_id: 1,
+      };
+      const data = await fakeRequest(app)
+      .post('/quarterbacks')
+      .send(newQuarterback)
+      .expect('Content-Type', /json/)
+      .expect(200);
+      
+      expect(data.body).toEqual(expectedQuarterback);
+
+      const allQuarterbacks = await fakeRequest(app)
+      .get('/quarterbacks')
+      .expect('Content-Type', /json/)
+      .expect(200);
+
+      const mattStafford = allQuarterbacks.body.find(quarterback => quarterback.name === 'Matt_Stafford');
+
+      expect(mattStafford).toEqual(expectedQuarterback)
+    });
+
+    test('updates a qb', async() => {
+
+      const newQuarterback = {
+        name: 'Kyler_Murray',
+        accuracy: 87,
+        is_old: false,
+      };
+
+      const expectedQuarterback = {
+        ...newQuarterback,
+        owner_id: 1,
+        id: 1,
+      }
+
+    await fakeRequest(app)
+    .put('/quarterbacks/1')
+    .send(newQuarterback)
+    .expect('Content-Type', /json/)
+    .expect(200);
+
+    const updatedQuarterback = await fakeRequest(app)
+    .get('/quarterbacks/1')
+    .expect('Content-Type', /json/)
+    .expect(200);
+
+    expect(updatedQuarterback.body).toEqual(expectedQuarterback);
+    });
+
+  test('deletes a QB with matching id', async() => {
+    const expectation = {
+      'id': 3,
+      'name': 'Patrick_Mahomes',
+      'accuracy': 97,
+      'is_old': false,
+      'owner_id': 1
+    };
+
+    const data = await fakeRequest(app)
+    .delete('/quarterbacks/3')
+    .expect('Content-Type', /json/)
+    .expect(200);
+
+    expect(data.body).toEqual(expectation)
+
+    const empty = await fakeRequest(app)
+    .get('/quarterbacks/3')
+    .expect('Content-Type', /json/)
+    .expect(200);
+
+  expect(empty.body).toEqual('');
   });
 });
 });

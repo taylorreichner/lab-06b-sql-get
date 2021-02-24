@@ -40,6 +40,8 @@ describe('app routes', () => {
             'name': 'Tom_Brady',
             'accuracy': 94,
             'is_old': true,
+            'style_id': 1,
+            'style': 'Pocket_Passer',
             'owner_id': 1
         },
         {
@@ -47,12 +49,16 @@ describe('app routes', () => {
             'name': 'Aaron_Rodgers',
             'accuracy': 98,
             'is_old': true,
+            'style_id': 2,
+            'style': 'Gun_Slinger',
             'owner_id': 1
         },
         {   'id': 3,
             'name': 'Patrick_Mahomes',
             'accuracy': 97,
             'is_old': false,
+            'style_id': 2,
+            'style': 'Gun_Slinger',
             'owner_id': 1
         },
         {
@@ -60,6 +66,8 @@ describe('app routes', () => {
           'name': 'Russel_Wilson',
           'accuracy': 96,
           'is_old': true,
+          'style_id': 3,
+          'style': 'Balanced',
           'owner_id': 1
       },
       {
@@ -67,6 +75,8 @@ describe('app routes', () => {
           'name': 'Josh_Allen',
           'accuracy': 91,
           'is_old': false,
+          'style_id': 4,
+          'style': 'Mobile',
           'owner_id': 1
       },
       {
@@ -74,6 +84,8 @@ describe('app routes', () => {
           'name': 'Drew_Brees',
           'accuracy': 93,
           'is_old': true,
+          'style_id': 1,
+          'style': 'Pocket_Passer',
           'owner_id': 1
       },
     ];
@@ -89,13 +101,15 @@ describe('app routes', () => {
       expect(data.body).toEqual(quarterbacks);
       });
 
-      test('returns a single candy with the matching id', async() => {
+      test('returns a single qb with the matching id', async() => {
 
         const singleQB = {
             'id': 1,
             'name': 'Tom_Brady',
+            'style': 'Pocket_Passer',
             'accuracy': 94,
             'is_old': true,
+            'style_id': 1,
             'owner_id': 1
         };
 
@@ -112,11 +126,15 @@ describe('app routes', () => {
         name: 'Matt_Stafford',
         accuracy: 89,
         is_old: true,
-      };
+        style_id: 1,
+        
+         };
       const expectedQuarterback = {
         ...newQuarterback,
         id: 7,
         owner_id: 1,
+        style: 'Pocket_Passer',
+
       };
       const data = await fakeRequest(app)
       .post('/quarterbacks')
@@ -127,12 +145,12 @@ describe('app routes', () => {
       expect(data.body).toEqual(expectedQuarterback);
 
       const allQuarterbacks = await fakeRequest(app)
-      .get('/quarterbacks')
+      .get('/quarterbacks/7')
       .expect('Content-Type', /json/)
       .expect(200);
 
       const mattStafford = allQuarterbacks.body.find(quarterback => quarterback.name === 'Matt_Stafford');
-
+      
       expect(mattStafford).toEqual(expectedQuarterback)
     });
 
@@ -170,7 +188,8 @@ describe('app routes', () => {
       'name': 'Patrick_Mahomes',
       'accuracy': 97,
       'is_old': false,
-      'owner_id': 1
+      'style_id': 2,
+      'owner_id': 1,
     };
 
     const data = await fakeRequest(app)

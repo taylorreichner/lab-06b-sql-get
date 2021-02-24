@@ -13,17 +13,23 @@ async function run() {
     // run a query to create tables
     await client.query(`
                 CREATE TABLE users (
-                    id SERIAL PRIMARY KEY,
+                    id SERIAL PRIMARY KEY NOT NULL,
                     email VARCHAR(256) NOT NULL,
                     hash VARCHAR(512) NOT NULL
-                );           
+                );   
+                CREATE TABLE styles (
+                  id SERIAL PRIMARY KEY NOT NULL,
+                  name VARCHAR(512) NOT NULL
+                );
                 CREATE TABLE quarterbacks (
                     id SERIAL PRIMARY KEY NOT NULL,
                     name VARCHAR(512) NOT NULL,
                     accuracy INTEGER NOT NULL,
                     is_old BOOLEAN NOT NULL,
+                    style_id INTEGER NOT NULL REFERENCES styles(id),
                     owner_id INTEGER NOT NULL REFERENCES users(id)
             );
+               
         `);
 
     console.log('create tables complete', getEmoji(), getEmoji(), getEmoji());
